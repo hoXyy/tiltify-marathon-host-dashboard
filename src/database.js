@@ -13,10 +13,6 @@ class Database {
     );
   }
 
-  /*   update(key, value) {
-    return db.child(key).update(value);
-  } */
-
   delete(id) {
     return set(
       ref(database, `${process.env.VUE_APP_TILTIFY_CAMPAIGN_ID}/${id}`),
