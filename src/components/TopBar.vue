@@ -22,7 +22,7 @@ export default {
   data: () => ({
     time: "00:00:00",
     refreshTimer: undefined,
-    timeLeft: 60,
+    timeLeft: 30,
   }),
   methods: {
     updateCurrentTime() {
@@ -59,7 +59,7 @@ export default {
     refreshing: {
       handler: function () {
         if (!this.refreshing) {
-          this.timeLeft = 60;
+          this.timeLeft = 30;
           this.startRefreshCountdown();
         } else {
           console.log("The data is currently refreshing!");

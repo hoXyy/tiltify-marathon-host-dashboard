@@ -11,7 +11,7 @@
           <b>Amount:</b>
           {{ amount }}
         </p>
-        <p v-if="donation.comment.length > 0">
+        <p v-if="donation.comment">
           <b>Comment:</b> {{ donation.comment }}
         </p>
       </div>
