@@ -11,9 +11,8 @@
           <b>Amount:</b>
           {{ amount }}
         </p>
-        <p v-if="donation.comment">
-          <b>Comment:</b> {{ donation.comment }}
-        </p>
+        <p v-if="donation.comment"><b>Comment:</b> {{ donation.comment }}</p>
+        <p><b>Timestamp: </b> {{ timestamp }}</p>
       </div>
 
       <v-btn color="error" @click="setDonationAsUnread">Mark as unread</v-btn>
@@ -33,6 +32,20 @@ export default {
         style: "currency",
         currency: "USD",
       }).format(this.donation.amount);
+    },
+    timestamp() {
+      let options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      };
+      return new Date(this.donation.completedAt).toLocaleString(
+        "en-GB",
+        options
+      );
     },
   },
   methods: {

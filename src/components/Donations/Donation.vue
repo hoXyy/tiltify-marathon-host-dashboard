@@ -11,9 +11,8 @@
           <b>Amount:</b>
           {{ amount }}
         </p>
-        <p v-if="donation.comment">
-          <b>Comment:</b> {{ donation.comment }}
-        </p>
+        <p v-if="donation.comment"><b>Comment:</b> {{ donation.comment }}</p>
+        <p><b>Timestamp: </b> {{ timestamp }}</p>
       </div>
 
       <v-btn color="success" @click="setDonationAsRead">Mark as read</v-btn>
@@ -22,7 +21,7 @@
 </template>
 
 <script>
-import Database from '../../database';
+import Database from "../../database";
 
 export default {
   name: "Donation",
@@ -34,11 +33,25 @@ export default {
         currency: "USD",
       }).format(this.donation.amount);
     },
+    timestamp() {
+      let options = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      };
+      return new Date(this.donation.completedAt).toLocaleString(
+        "en-GB",
+        options
+      );
+    },
   },
   methods: {
-      setDonationAsRead() {
-          Database.set(this.donation);
-      }
-  }
+    setDonationAsRead() {
+      Database.set(this.donation);
+    },
+  },
 };
 </script>
