@@ -1,39 +1,49 @@
 {
   "name": "tiltify-marathon-host-dashboard",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "A donation reading dashboard for marathons using Tiltify for donations.",
+  "main": "index.js",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoXyy/tiltify-marathon-host-dashboard.git"
+  },
+  "keywords": [
+    "tiltify"
+  ],
+  "author": "hoXyy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoXyy/tiltify-marathon-host-dashboard/issues"
+  },
+  "homepage": "https://github.com/hoXyy/tiltify-marathon-host-dashboard#readme",
   "dependencies": {
-    "axios": "^0.24.0",
-    "core-js": "^3.6.5",
-    "firebase": "^9.5.0",
-    "tiltify-api-client": "^1.1.2",
-    "vue": "^2.6.11",
-    "vue-router": "^3.2.0",
-    "vuetify": "^2.4.0",
-    "vuex": "^3.4.0"
+    "@prisma/client": "^6.3.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.0.1",
+    "path": "^0.12.7",
+    "pg-monitor": "^2.1.0",
+    "pg-promise": "^11.10.2",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@mdi/font": "^6.5.95",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^6.2.2",
-    "prettier": "^2.2.1",
-    "sass": "~1.32.0",
-    "sass-loader": "^10.0.0",
-    "vue-cli-plugin-vuetify": "^2.4.4",
-    "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.7.0"
+    "@eslint/js": "^9.20.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.1",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.14.0",
+    "prettier": "3.5.0",
+    "prisma": "^6.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.23.0"
   }
 }
