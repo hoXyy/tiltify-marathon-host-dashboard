@@ -14,11 +14,35 @@ datasource db {
 }
 
 model Donation {
-  donation_id Int @id
-  event_id Int
-  name String
-  amount String
+  donation_id String  @id
+  name        String
+  amount      String
   description String?
+  donation_time DateTime
+  is_read     Boolean @default(false)
+
+  campaign_id String
+  campaign    CampaignData @relation(fields: [campaign_id], references: [id])
 
   @@map("donations")
+}
+
+model CampaignData {
+  id              String @id
+  amount_raised   String
+  amount_currency String
+
+  donations Donation[]
+
+  @@map("campaign_data")
+}
+
+model TiltifyToken {
+  id           String   @id @default(uuid())
+  access_token String
+  token_type   String
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+
+  @@map("tiltify_token")
 }

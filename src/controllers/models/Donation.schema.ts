@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const donationSchema = z.object({
-  donation_id: z.number(),
-  event_id: z.number(),
+  donation_id: z.string(),
+  campaign_id: z.string(),
   name: z.string(),
   amount: z
     .string()
@@ -10,7 +10,9 @@ export const donationSchema = z.object({
       /^\d+\.\d{2}$/,
       "Amount must be a valid number with two decimal places",
     ),
-  description: z.string().nullable(),
+  description: z.string().optional(),
+  donation_time: z.date(),
+  is_read: z.boolean().optional(),
 });
 
 export const donationsSchema = z.array(donationSchema);
