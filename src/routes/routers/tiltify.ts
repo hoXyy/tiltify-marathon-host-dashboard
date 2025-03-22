@@ -21,6 +21,26 @@ tiltifyRouter.get("/get-amount", async (_req: Request, res: Response) => {
   res.json(campaignAmountData ?? {});
 });
 
+tiltifyRouter.post(
+  "/update-recent-donations",
+  async (_req: Request, res: Response) => {
+    try {
+      const mostRecentDonationsFromTiltify =
+        await tiltifyClient.getRecentDonations();
+
+      const addedDonations = await db.donation.createManyAndReturn({
+        data: mostRecentDonationsFromTiltify,
+        skipDuplicates: true,
+      });
+
+      res.json(addedDonations);
+    } catch (error) {
+      logger.error("Server error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+);
+
 tiltifyRouter.post("/update-amount", async (_req: Request, res: Response) => {
   try {
     const campaignId = process.env.TILTIFY_CAMPAIGN_ID;
@@ -30,25 +50,26 @@ tiltifyRouter.post("/update-amount", async (_req: Request, res: Response) => {
       res.status(400).json({ error: "Missing campaign ID!" });
     }
 
-    const newAmountData = await tiltifyClient.getCampaignAmount();
+    const newCampaignData = await tiltifyClient.getCampaignData();
 
-    if (!newAmountData) {
+    if (!newCampaignData) {
       logger.error("Error getting updated amount!");
       res.status(400).json({ error: "Error getting updated amount!" });
     }
 
     const updatedDBData = await db.campaignData.upsert({
       create: {
-        id: campaignId!,
-        amount_currency: newAmountData!.currency,
-        amount_raised: newAmountData!.value,
+        id: newCampaignData!.id,
+        name: newCampaignData!.name,
+        amount_currency: newCampaignData!.amount_raised.currency,
+        amount_raised: newCampaignData!.amount_raised.value,
       },
       update: {
-        amount_currency: newAmountData!.currency,
-        amount_raised: newAmountData!.value,
+        amount_currency: newCampaignData!.amount_raised.currency,
+        amount_raised: newCampaignData!.amount_raised.value,
       },
       where: {
-        id: campaignId,
+        id: newCampaignData!.id,
       },
     });
 

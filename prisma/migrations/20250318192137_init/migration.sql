@@ -14,6 +14,7 @@ CREATE TABLE "donations" (
 -- CreateTable
 CREATE TABLE "campaign_data" (
     "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "amount_raised" TEXT NOT NULL,
     "amount_currency" TEXT NOT NULL,
 

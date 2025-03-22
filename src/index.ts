@@ -18,9 +18,11 @@ app.use(errorHandler);
 
 (async () => {
   try {
-    await tiltifyClient.getAllDonations(); // Only on init
+    // Only on init
+    await tiltifyClient.getInitialCampaignData();
+    await tiltifyClient.getAllDonations();
   } catch (error) {
-    console.error("[ERROR] Failed to fetch donations:", error);
+    logger.error("Failed to fetch donations:", error);
   }
 })();
 

@@ -2,8 +2,8 @@ import axios, { AxiosResponse } from "axios";
 import {
   TiltifyTokenResponse,
   TiltifyTokenData,
+  TiltifyCampaignDataResponse,
   TiltifyCampaignData,
-  TiltifyCampaignAmountRaised,
   TiltifyRawDonationResponse,
   TiltifyRawDonation,
 } from "./types";
@@ -93,10 +93,8 @@ export class TiltifyClient {
     return newToken;
   }
 
-  /** Gets amount raised for campaign. */
-  public async getCampaignAmount(): Promise<
-    TiltifyCampaignAmountRaised | undefined
-  > {
+  /** Gets data for campaign. */
+  public async getCampaignData(): Promise<TiltifyCampaignData | undefined> {
     try {
       const accessToken = await this.getValidAccessToken();
 
@@ -105,7 +103,7 @@ export class TiltifyClient {
         return;
       }
 
-      const campaignData = await axios.get<TiltifyCampaignData>(
+      const rawCampaignData = await axios.get<TiltifyCampaignDataResponse>(
         `https://v5api.tiltify.com/api/public/campaigns/${this.campaignId}`,
         {
           headers: {
@@ -114,12 +112,59 @@ export class TiltifyClient {
         },
       );
 
-      return campaignData.data.data.total_amount_raised;
+      const campaignData: TiltifyCampaignData = {
+        id: rawCampaignData.data.data.id,
+        name: rawCampaignData.data.data.name,
+        amount_raised: rawCampaignData.data.data.total_amount_raised,
+      };
+
+      return campaignData;
     } catch (err) {
       logger.error(
         "Error occurred trying to get the campaign raised amount: ",
         err,
       );
+    }
+  }
+
+  /** Gets 50 most recent donations. */
+  public async getRecentDonations(): Promise<z.infer<typeof donationsSchema>> {
+    try {
+      const accessToken = await this.getValidAccessToken();
+      const perPage = 50;
+      const donations: z.infer<typeof donationsSchema> = [];
+
+      if (!accessToken) {
+        logger.error("No access token received!");
+        return [];
+      }
+
+      const response: AxiosResponse<TiltifyRawDonationResponse> =
+        await axios.get(
+          `https://v5api.tiltify.com/api/public/campaigns/${this.campaignId}/donations`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              limit: perPage,
+            },
+          },
+        );
+
+      const { data } = response.data;
+
+      const formattedDonations = this.formatRawDonations(data);
+
+      donations.push(...formattedDonations);
+
+      return donations;
+    } catch (error) {
+      logger.error(
+        "Error occurred trying to get most recent donations: ",
+        error,
+      );
+      return [];
     }
   }
 
@@ -175,7 +220,40 @@ export class TiltifyClient {
         `Added ${addedDonations.length} donations to the database on startup...`,
       );
     } catch (error) {
-      logger.error("Error occurred trying to get all donations: ", error);
+      logger.error(`Error occurred trying to get all donations: ${error}`);
+    }
+  }
+
+  /** Gets initial data for campaign.
+   *
+   * *Only used during first startup, so this function is not exposed to the API and all the database functionality is done in this function.*
+   */
+  public async getInitialCampaignData(): Promise<void> {
+    try {
+      logger.info("Getting initial campaign data");
+      const campaignData = await this.getCampaignData();
+
+      if (!campaignData) {
+        throw new Error("No initial campaign data received!");
+      }
+
+      await db.campaignData.upsert({
+        create: {
+          id: campaignData.id,
+          name: campaignData.name,
+          amount_currency: campaignData.amount_raised.currency,
+          amount_raised: campaignData.amount_raised.value,
+        },
+        update: {
+          amount_currency: campaignData.amount_raised.currency,
+          amount_raised: campaignData.amount_raised.value,
+        },
+        where: {
+          id: campaignData.id,
+        },
+      });
+    } catch (error) {
+      logger.error(`Failed getting initial campaign data! Reason: ${error}`);
     }
   }
 

@@ -14,12 +14,12 @@ datasource db {
 }
 
 model Donation {
-  donation_id String  @id
-  name        String
-  amount      String
-  description String?
+  donation_id   String   @id
+  name          String
+  amount        String
+  description   String?
   donation_time DateTime
-  is_read     Boolean @default(false)
+  is_read       Boolean  @default(false)
 
   campaign_id String
   campaign    CampaignData @relation(fields: [campaign_id], references: [id])
@@ -29,6 +29,7 @@ model Donation {
 
 model CampaignData {
   id              String @id
+  name            String
   amount_raised   String
   amount_currency String
 

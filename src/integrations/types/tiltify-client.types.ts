@@ -15,8 +15,10 @@ export type TiltifyTokenData = {
   created_at: Date;
 };
 
-export type TiltifyCampaignData = {
+export type TiltifyCampaignDataResponse = {
   data: {
+    id: string;
+    name: string;
     total_amount_raised: {
       currency: string;
       value: string;
@@ -24,9 +26,13 @@ export type TiltifyCampaignData = {
   };
 };
 
-export type TiltifyCampaignAmountRaised = {
-  currency: string;
-  value: string;
+export type TiltifyCampaignData = {
+  id: string;
+  name: string;
+  amount_raised: {
+    currency: string;
+    value: string;
+  };
 };
 
 export type TiltifyRawDonation = {

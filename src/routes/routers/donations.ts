@@ -7,8 +7,8 @@ import logger from "../../integrations/logger";
 
 const donationsRouter = Router();
 
-donationsRouter.get("/all/:eventId", async (req, res) => {
-  const eventId = req.params.eventId;
+donationsRouter.get("/all", async (req, res) => {
+  const eventId = process.env.TILTIFY_CAMPAIGN_ID;
 
   const donations = await db.donation.findMany({
     where: {
