@@ -21,6 +21,52 @@ tiltifyRouter.get("/get-amount", async (_req: Request, res: Response) => {
   res.json(campaignAmountData ?? {});
 });
 
+tiltifyRouter.get(
+  "/get-all-campaign-info",
+  async (_req: Request, res: Response) => {
+    const campaignData = await db.campaignData.findFirst({
+      where: { id: process.env.TILTIFY_CAMPAIGN_ID },
+      include: { donations: true },
+    });
+
+    res.json(campaignData ?? {});
+  },
+);
+
+tiltifyRouter.post(
+  "/update-all-campaign-info",
+  async (_req: Request, res: Response) => {
+    const campaignId = process.env.TILTIFY_CAMPAIGN_ID;
+
+    if (!campaignId) {
+      logger.error("Missing campaign ID!");
+      res.status(400).json({ error: "Missing campaign ID!" });
+    }
+
+    const newCampaignData = await tiltifyClient.getCampaignData();
+
+    if (!newCampaignData) {
+      logger.error("Error getting updated amount!");
+      res.status(400).json({ error: "Error getting updated amount!" });
+    }
+
+    const mostRecentDonationsFromTiltify =
+      await tiltifyClient.getRecentDonations();
+
+    await db.donation.createMany({
+      data: mostRecentDonationsFromTiltify,
+      skipDuplicates: true,
+    });
+
+    const campaignData = await db.campaignData.findFirst({
+      where: { id: campaignId },
+      include: { donations: true },
+    });
+
+    res.json(campaignData ?? {});
+  },
+);
+
 tiltifyRouter.post(
   "/update-recent-donations",
   async (_req: Request, res: Response) => {

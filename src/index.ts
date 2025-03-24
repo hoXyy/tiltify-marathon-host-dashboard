@@ -5,6 +5,8 @@ import apiRouter from "./routes/api";
 import errorHandler from "./middleware/errorHandler.middleware";
 import { tiltifyClient } from "./routes/routers/tiltify";
 import logger from "./integrations/logger";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(cors());
