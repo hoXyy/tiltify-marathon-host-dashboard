@@ -50,6 +50,22 @@ tiltifyRouter.post(
       res.status(400).json({ error: "Error getting updated amount!" });
     }
 
+    await db.campaignData.upsert({
+      create: {
+        id: newCampaignData!.id,
+        name: newCampaignData!.name,
+        amount_currency: newCampaignData!.amount_raised.currency,
+        amount_raised: newCampaignData!.amount_raised.value,
+      },
+      update: {
+        amount_currency: newCampaignData!.amount_raised.currency,
+        amount_raised: newCampaignData!.amount_raised.value,
+      },
+      where: {
+        id: newCampaignData!.id,
+      },
+    });
+
     const mostRecentDonationsFromTiltify =
       await tiltifyClient.getRecentDonations();
 
@@ -60,7 +76,11 @@ tiltifyRouter.post(
 
     const campaignData = await db.campaignData.findFirst({
       where: { id: campaignId },
-      include: { donations: true },
+      include: {
+        donations: {
+          orderBy: { donation_time: "desc" },
+        },
+      },
     });
 
     res.json(campaignData ?? {});
