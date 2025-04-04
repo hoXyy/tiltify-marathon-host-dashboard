@@ -4,8 +4,10 @@ services:
     restart: unless-stopped
     volumes:
       - db-data:/var/lib/postgresql/data
-    env_file:
-      - .env.dev
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
     command: postgres -c listen_addresses='*'
