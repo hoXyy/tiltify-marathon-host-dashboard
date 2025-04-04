@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Donation {
+  donation_id   String   @id
+  name          String
+  amount        String
+  description   String?
+  donation_time DateTime
+  is_read       Boolean  @default(false)
+
+  campaign_id String
+  campaign    CampaignData @relation(fields: [campaign_id], references: [id])
+
+  @@map("donations")
+}
+
+model CampaignData {
+  id              String @id
+  name            String
+  amount_raised   String
+  amount_currency String
+
+  donations Donation[]
+
+  @@map("campaign_data")
+}
+
+model TiltifyToken {
+  id           String   @id @default(uuid())
+  access_token String
+  token_type   String
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+
+  @@map("tiltify_token")
+}

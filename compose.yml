@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build: client
+    container_name: tiltify-frontend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
+  backend:
+    build: .
+    container_name: tiltify-backend
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
