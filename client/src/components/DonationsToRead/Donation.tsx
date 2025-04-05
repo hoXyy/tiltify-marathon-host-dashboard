@@ -13,7 +13,7 @@ type Props = {
 };
 
 function markDonationAsRead(id: string) {
-  axios.post(`http://localhost:3000/api/donations/mark_as_read/${id}`);
+  axios.post(`${import.meta.env.VITE_API_URL}/api/donations/mark_as_read/${id}`);
 }
 
 export const Donation = ({ donation }: Props) => {
