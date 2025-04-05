@@ -62,7 +62,7 @@ function App() {
 
     try {
       const response = await axios.post<Campaign>(
-        `${process.env.API_URL}/api/tiltify/update-all-campaign-info`
+        `${import.meta.env.VITE_API_URL}/api/tiltify/update-all-campaign-info`
       );
       setCampaignData(response.data);
     } catch (err) {

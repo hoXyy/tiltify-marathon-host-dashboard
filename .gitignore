@@ -28,3 +28,6 @@ pnpm-debug.log*
 .firebaserc
 firebase.json
 .firebase
+
+# SQLite DB
+prisma/tiltify.*

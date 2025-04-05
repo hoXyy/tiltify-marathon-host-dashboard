@@ -11,5 +11,5 @@ services:
     container_name: tiltify-backend
     ports:
       - "3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    volumes:
+      - "./prisma/tiltify.db:/tiltify-api/prisma/tiltify.db:rw"

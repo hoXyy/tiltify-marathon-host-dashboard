@@ -2,3 +2,5 @@ node_modules
 client
 .env
 dist
+prisma/tiltify.db
+prisma/tiltify.db-journal

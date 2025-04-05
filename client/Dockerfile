@@ -2,7 +2,7 @@ FROM node:22-alpine3.20
 
 WORKDIR /tiltify-frontend
 
-ENV API_URL=http://localhost:3000
+ENV VITE_API_URL=http://localhost:3000
 
 # Copy package.json and package-lock.json first (for better caching)
 COPY package*.json ./

@@ -32,7 +32,6 @@ tiltifyRouter.get(
     res.json(campaignData ?? {});
   },
 );
-
 tiltifyRouter.post(
   "/update-all-campaign-info",
   async (_req: Request, res: Response) => {
@@ -69,12 +68,28 @@ tiltifyRouter.post(
     const mostRecentDonationsFromTiltify =
       await tiltifyClient.getRecentDonations();
 
-    await db.donation.createMany({
-      data: mostRecentDonationsFromTiltify,
-      skipDuplicates: true,
+    // Get existing donation IDs
+    const existingDonations = await db.donation.findMany({
+      where: {
+        donation_id: {
+          in: mostRecentDonationsFromTiltify.map((d) => d.donation_id),
+        },
+      },
+      select: { donation_id: true },
     });
 
-    const campaignData = await db.campaignData.findFirst({
+    const existingIds = new Set(existingDonations.map((d) => d.donation_id));
+
+    // Filter out duplicates
+    const newDonations = mostRecentDonationsFromTiltify.filter(
+      (donation) => !existingIds.has(donation.donation_id),
+    );
+
+    await db.donation.createMany({
+      data: newDonations,
+    });
+
+    const campaignData = await db.campaignData.findUnique({
       where: { id: campaignId },
       include: {
         donations: {
@@ -94,12 +109,26 @@ tiltifyRouter.post(
       const mostRecentDonationsFromTiltify =
         await tiltifyClient.getRecentDonations();
 
-      const addedDonations = await db.donation.createManyAndReturn({
-        data: mostRecentDonationsFromTiltify,
-        skipDuplicates: true,
+      const existingDonations = await db.donation.findMany({
+        where: {
+          donation_id: {
+            in: mostRecentDonationsFromTiltify.map((d) => d.donation_id),
+          },
+        },
+        select: { donation_id: true },
       });
 
-      res.json(addedDonations);
+      const existingIds = new Set(existingDonations.map((d) => d.donation_id));
+
+      const newDonations = mostRecentDonationsFromTiltify.filter(
+        (donation) => !existingIds.has(donation.donation_id),
+      );
+
+      await db.donation.createMany({
+        data: newDonations,
+      });
+
+      res.json({ added: newDonations.length });
     } catch (error) {
       logger.error("Server error:", error);
       res.status(500).json({ error: "Internal Server Error" });

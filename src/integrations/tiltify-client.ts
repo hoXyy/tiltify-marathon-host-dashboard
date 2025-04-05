@@ -11,6 +11,7 @@ import db from "../controllers/database";
 import { donationsSchema } from "../controllers/models/Donation.schema";
 import { z } from "zod";
 import logger from "./logger";
+import { v4 as uuidv4 } from "uuid";
 
 export class TiltifyClient {
   private readonly clientId: string;
@@ -83,6 +84,7 @@ export class TiltifyClient {
 
     const newToken = await db.tiltifyToken.create({
       data: {
+        id: uuidv4(),
         access_token: access_token,
         token_type: token_type,
         expires_at: expiryDate,
@@ -203,21 +205,34 @@ export class TiltifyClient {
         const { data, metadata } = response.data;
 
         const formattedDonations = this.formatRawDonations(data);
-
         donations.push(...formattedDonations);
 
         cursorPosition = metadata.after;
         hasMore = cursorPosition !== null;
       }
 
-      const addedDonations = await db.donation.createManyAndReturn({
+      // Deduplicate manually for SQLite
+      const existing = await db.donation.findMany({
+        where: {
+          donation_id: {
+            in: donations.map((d) => d.donation_id),
+          },
+        },
         select: { donation_id: true },
-        data: donations,
-        skipDuplicates: true,
+      });
+
+      const existingIds = new Set(existing.map((d) => d.donation_id));
+
+      const newDonations = donations.filter(
+        (donation) => !existingIds.has(donation.donation_id),
+      );
+
+      await db.donation.createMany({
+        data: newDonations,
       });
 
       logger.info(
-        `Added ${addedDonations.length} donations to the database on startup...`,
+        `Added ${newDonations.length} donations to the database on startup...`,
       );
     } catch (error) {
       logger.error(`Error occurred trying to get all donations: ${error}`);
